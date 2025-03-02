@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이보람 일산/화정/파주센터 신규회원 회비 계산기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #D3D3D3;
+        }
+        h1 {
+            background-color: #808080; /* 회색 배경 */
+            color: white; /* 흰색 텍스트 */
+            padding: 10px;
+            text-align: center;
+        }
+        h3 {
+            margin-top: 20px;
+        }
+        .fee-breakdown {
+            margin-top: 30px;
+            border-top: 2px solid #000;
+            padding-top: 20px;
+        }
+        .total-fee {
+            font-weight: bold;
+            background-color: #FFFACD;
+        }
+        .total-fee-box {
+            background-color: #FFFACD;
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        /* 공통 스타일 */
+        .fee-item {
+            color: blue; /* 파랑색 글자 */
+            font-size: 18px; /* 폰트 크기 동일 */
+            padding-left: 20px; /* 왼쪽 여백 동일 */
+            font-weight: bold; /* 글자 굵게 */
+            text-align: left; /* 좌측 정렬 */
+        }
+        .next-payment-date {
+            background-color: #FFFFE0; /* 연한 노란색 배경 */
+            padding: 5px;
+            font-size: 18px; /* 폰트 크기 동일 */
+            color: blue; /* 파랑색 글자 */
+            padding-left: 20px; /* 왼쪽 여백 동일 */
+            font-weight: bold; /* 글자 굵게 */
+            text-align: left; /* 좌측 정렬 */
+        }
+    </style>
+</head>
+<body>
+    <h1>아이보람 일산/화정/파주센터 신규회원 회비 계산기</h1>
+    <label for="startDate">시작 날짜 (YYYY-MM-DD): </label>
+    <input type="date" id="startDate">
+    <button onclick="calculateFee()">계산하기</button>
+
+    <div id="result">
+        <h2>결과</h2>
+
+        <div class="total-fee-box">
+            <p class="fee-item"> ● 원장님 총 회비: <span id="directorFinalFeeResult"></span></p>
+            <p class="fee-item"> ● 강사님 총 회비: <span id="instructorFinalFeeResult"></span></p>
+        </div>
+
+        <!-- 한 줄 띄운 후 다음 회비 납부일 표시 -->
+        <br>
+
+        <div class="next-payment-date">
+            <p> ● 다음 회비 납부일 (신규등록 회원에게 알려드려야 함): <span id="nextPaymentDateResult"></span></p>
+        </div>
+
+        <div class="fee-breakdown">
+            <h3>원장님 회비계산 세부내역</h3>
+            <table id="directorFeeBreakdown">
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>계산 내역</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1개월차 일할 날짜</td>
+                        <td id="directorDays"></td>
+                    </tr>
+                    <tr>
+                        <td>1개월차 회비</td>
+                        <td id="directorFirstMonthFee"></td>
+                    </tr>
+                    <tr>
+                        <td>2개월차 회비</td>
+                        <td>190,000 원</td>
+                    </tr>
+                    <tr>
+                        <td>3개월차 회비</td>
+                        <td>190,000 원</td>
+                    </tr>
+                    <tr>
+                        <td>가입비</td>
+                        <td>30,000 원</td>
+                    </tr>
+                    <tr class="total-fee">
+                        <td>총 회비</td>
+                        <td id="directorFinalFee"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="fee-breakdown">
+            <h3>강사님 회비계산 세부내역</h3>
+            <table id="instructorFeeBreakdown">
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>계산 내역</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1개월차 일할 날짜</td>
+                        <td id="instructorDays"></td>
+                    </tr>
+                    <tr>
+                        <td>1개월차 회비</td>
+                        <td id="instructorFirstMonthFee"></td>
+                    </tr>
+                    <tr>
+                        <td>2개월차 회비</td>
+                        <td>160,000 원</td>
+                    </tr>
+                    <tr>
+                        <td>3개월차 회비</td>
+                        <td>160,000 원</td>
+                    </tr>
+                    <tr>
+                        <td>가입비</td>
+                        <td>30,000 원</td>
+                    </tr>
+                    <tr class="total-fee">
+                        <td>총 회비</td>
+                        <td id="instructorFinalFee"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function calculateFee() {
+            const startDate = document.getElementById('startDate').value;
+            if (!startDate) {
+                alert("시작 날짜를 입력해주세요.");
+                return;
+            }
+
+            // 날짜 계산
+            const start = new Date(startDate);
+            const month = start.getMonth(); // 0: January, 1: February, ...
+            const year = start.getFullYear();
+
+            // 날짜별 일할 계산
+            const daysInMonth = [31, (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            const daysInCurrentMonth = daysInMonth[month];
+            const daysLeft = daysInMonth[month] - start.getDate() + 1;
+
+            const directorFeePerDay = 190000 / daysInCurrentMonth; // 원장님 하루 회비
+            const instructorFeePerDay = 160000 / daysInCurrentMonth; // 강사님 하루 회비
+
+            // 일할 계산
+            const directorFirstMonthFee = Math.floor(directorFeePerDay * daysLeft);
+            const instructorFirstMonthFee = Math.floor(instructorFeePerDay * daysLeft);
+
+            // 3개월 선납
+            const directorSecondAndThirdMonthFee = 190000 * 2; // 2개월차와 3개월차 회비
+            const instructorSecondAndThirdMonthFee = 160000 * 2; // 2개월차와 3개월차 회비
+
+            const directorTotalFee = directorFirstMonthFee + directorSecondAndThirdMonthFee + 30000; // 가입비 3만원 포함
+            const instructorTotalFee = instructorFirstMonthFee + instructorSecondAndThirdMonthFee + 30000; // 가입비 3만원 포함
+
+            // 백원 단위 절사
+            const directorFinalFee = Math.floor(directorTotalFee / 100) * 100;
+            const instructorFinalFee = Math.floor(instructorTotalFee / 100) * 100;
+
+            // 결과 출력
+            document.getElementById('directorDays').innerText = daysLeft + "일";
+            document.getElementById('directorFirstMonthFee').innerText = `${directorFirstMonthFee.toLocaleString()} 원`;
+            document.getElementById('directorFinalFee').innerText = `${directorFinalFee.toLocaleString()} 원`;
+
+            document.getElementById('instructorDays').innerText = daysLeft + "일";
+            document.getElementById('instructorFirstMonthFee').innerText = `${instructorFirstMonthFee.toLocaleString()} 원`;
+            document.getElementById('instructorFinalFee').innerText = `${instructorFinalFee.toLocaleString()} 원`;
+
+            // 총 회비 결과 바로 위에 표시
+            document.getElementById('directorFinalFeeResult').innerText = `${directorFinalFee.toLocaleString()} 원`;
+            document.getElementById('instructorFinalFeeResult').innerText = `${instructorFinalFee.toLocaleString()} 원`;
+
+            // "다음 회비 납부일" 계산
+            const nextPaymentDate = new Date(start);
+            nextPaymentDate.setMonth(start.getMonth() + 3); // 3개월 후
+            nextPaymentDate.setDate(1); // 1일로 설정
+
+            const nextPaymentDateStr = nextPaymentDate.toISOString().split('T')[0]; // "YYYY-MM-DD" 형식
+
+            // "결과" 섹션에 표시
+            document.getElementById('nextPaymentDateResult').innerText = nextPaymentDateStr;
+
+            // "원장님 회비 세부내역" 섹션에 표시
+            document.getElementById('nextPaymentDateDirector').innerText = nextPaymentDateStr;
+        }
+    </script>
+</body>
+</html>
