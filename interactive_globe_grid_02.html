@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive 3D Globe</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: transparent; /* 디버깅 시 #111 추천 */
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="globe"></canvas>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@0.158.0';
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75, window.innerWidth / window.innerHeight, 0.1, 1000
+    );
+    camera.position.z = 6;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Light
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+
+    // Globe base (transparent)
+    const radius = 2;
+    const segments = 64;
+    const globeMaterial = new THREE.MeshStandardMaterial({
+      color: 0x888888,
+      metalness: 0.2,
+      roughness: 0.5,
+      transparent: true,
+      opacity: 0.15
+    });
+    const globeGeometry = new THREE.SphereGeometry(radius, segments, segments);
+    const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+    scene.add(globe);
+
+    // Line materials
+    const defaultMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const highlightMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+    const gridLines = [];
+
+    // Longitude lines (vertical)
+    for (let i = 0; i < 9; i++) {
+      const phi = (i / 8) * Math.PI;
+      const points = [];
+      for (let theta = 0; theta <= Math.PI; theta += Math.PI / 100) {
+        const x = radius * Math.sin(theta) * Math.cos(phi);
+        const y = radius * Math.cos(theta);
+        const z = radius * Math.sin(theta) * Math.sin(phi);
+        points.push(new THREE.Vector3(x, y, z));
+      }
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const line = new THREE.Line(geometry, defaultMaterial.clone());
+      scene.add(line);
+      gridLines.push(line);
+    }
+
+    // Latitude lines (horizontal)
+    for (let j = 1; j < 10; j++) {
+      const theta = (j / 10) * Math.PI;
+      const points = [];
+      for (let phi = 0; phi <= 2 * Math.PI; phi += Math.PI / 100) {
+        const x = radius * Math.sin(theta) * Math.cos(phi);
+        const y = radius * Math.cos(theta);
+        const z = radius * Math.sin(theta) * Math.sin(phi);
+        points.push(new THREE.Vector3(x, y, z));
+      }
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const line = new THREE.Line(geometry, defaultMaterial.clone());
+      scene.add(line);
+      gridLines.push(line);
+    }
+
+    // Raycaster for hover effect
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let lastHovered = null;
+
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(gridLines);
+
+      if (intersects.length > 0) {
+        if (lastHovered && lastHovered !== intersects[0].object) {
+          lastHovered.material.color.set(0xffffff);
+        }
+        lastHovered = intersects[0].object;
+        lastHovered.material.color.set(0xff0000);
+      } else {
+        if (lastHovered) {
+          lastHovered.material.color.set(0xffffff);
+          lastHovered = null;
+        }
+      }
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+
+    // Responsive resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      globe.rotation.y += 0.002;
+      gridLines.forEach(line => line.rotation.y += 0.002);
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
