@@ -19,7 +19,7 @@
     /* 입력 영역 */
     label { font-weight:700; width:180px; font-size:18px; }
     input, button { padding:10px 12px; font-size:16px; }
-    input[type="date"], input[type="number"] { width:240px; border:1px solid #d1d5db; border-radius:8px; text-align:right; }
+    input[type="date"], input[type="text"] { width:240px; border:1px solid #d1d5db; border-radius:8px; text-align:right; }
     .field-group { display:flex; flex-direction:column; gap:8px; max-width:760px; }
     .field-row { display:flex; align-items:center; gap:20px; }
     button {
@@ -51,8 +51,10 @@
       background-color: #fffacd;
       display: block;
       padding: 10px 12px;
-      border-radius: 6px;
+      border: 3px solid #f59e0b;
+      border-radius: 8px;
       margin-bottom: 8px;
+      font-weight: 900;
     }
     .result-box { background:var(--accent); border:3px solid #f59e0b; border-radius:8px; padding:14px; font-size:18px; font-weight:700; margin-top:0; }
     .fee-item { color:#1d4ed8; font-size:18px; font-weight:700; text-align:left; margin:10px 0; }
@@ -80,20 +82,20 @@
 
     <div class="field-row">
       <label for="directorMonthly">● 원장님 월회비</label>
-      <input type="number" id="directorMonthly" placeholder="예: 190000" step="10" />
-      <button class="default-btn" onclick="setDefault('directorMonthly',190000)">기본값</button>
+      <input type="text" id="directorMonthly" placeholder="예: 190,000 원" oninput="formatNumber(this,true)" />
+      <button class="default-btn" onclick="setDefaultFormatted('directorMonthly',190000,true)">기본값</button>
     </div>
 
     <div class="field-row">
       <label for="instructorMonthly">● 강사님 월회비</label>
-      <input type="number" id="instructorMonthly" placeholder="예: 160000" step="10" />
-      <button class="default-btn" onclick="setDefault('instructorMonthly',160000)">기본값</button>
+      <input type="text" id="instructorMonthly" placeholder="예: 160,000 원" oninput="formatNumber(this,true)" />
+      <button class="default-btn" onclick="setDefaultFormatted('instructorMonthly',160000,true)">기본값</button>
     </div>
 
     <div class="field-row">
       <label for="signupFee">● 가입비</label>
-      <input type="number" id="signupFee" placeholder="예: 30000" step="10" />
-      <button class="default-btn" onclick="setDefault('signupFee',30000)">기본값</button>
+      <input type="text" id="signupFee" placeholder="예: 30,000 원" oninput="formatNumber(this,true)" />
+      <button class="default-btn" onclick="setDefaultFormatted('signupFee',30000,true)">기본값</button>
     </div>
   </div>
 
@@ -178,10 +180,29 @@
   </div>
 
   <script>
-    function setDefault(id, value){ document.getElementById(id).value = value; }
+    function formatNumber(input, showWon=false){
+      const value = input.value.replace(/[^0-9]/g, '');
+      if(value === '') { input.value = ''; return; }
+      input.value = Number(value).toLocaleString('ko-KR') + (showWon ? ' 원' : '');
+    }
+
+    function setDefaultFormatted(id, value, showWon=false){
+      document.getElementById(id).value = value.toLocaleString('ko-KR') + (showWon ? ' 원' : '');
+    }
+
+    function unformatNumber(str){
+      return Number(str.replace(/[^0-9]/g, ''));
+    }
+
     function formatISODate(date){ const y=date.getFullYear(); const m=String(date.getMonth()+1).padStart(2,'0'); const d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
     function daysInMonth(year, m0){ return new Date(year, m0+1, 0).getDate(); }
-    function valOrDefault(id, def){ const raw=(document.getElementById(id).value||'').trim(); if(raw==='') return def; const n=Number(raw.replace(/[^0-9.-]/g,'')); return Number.isFinite(n)?n:def; }
+
+    function valOrDefault(id, def){
+      const raw=(document.getElementById(id).value||'').trim();
+      if(raw==='') return def;
+      const n=unformatNumber(raw);
+      return Number.isFinite(n)?n:def;
+    }
 
     function calculateFee(){
       const startDateStr = document.getElementById('startDate').value;
@@ -197,7 +218,7 @@
       const month0 = start.getMonth();
       const totalDays = daysInMonth(year, month0);
       const startDay = start.getDate();
-      const daysLeft = totalDays - startDay + 1; // 시작일 포함
+      const daysLeft = totalDays - startDay + 1;
 
       const directorFirstMonthFee = Math.floor((DIRECTOR_MONTHLY / totalDays) * daysLeft);
       const instructorFirstMonthFee = Math.floor((INSTRUCTOR_MONTHLY / totalDays) * daysLeft);
@@ -232,9 +253,9 @@
     (function initDefaults(){
       const today = new Date();
       document.getElementById('startDate').value = formatISODate(today);
-      setDefault('directorMonthly',190000);
-      setDefault('instructorMonthly',160000);
-      setDefault('signupFee',30000);
+      setDefaultFormatted('directorMonthly',190000,true);
+      setDefaultFormatted('instructorMonthly',160000,true);
+      setDefaultFormatted('signupFee',30000,true);
     })();
   </script>
 </body>
