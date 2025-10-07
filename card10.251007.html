@@ -6,131 +6,111 @@
   <title>아이보람 일산/화정/파주센터 신규회원 회비 계산기</title>
   <style>
     :root {
-      --gray-900: #1f2937;
-      --gray-700: #374151;
-      --gray-100: #f3f4f6;
       --brand: #2563eb;
       --accent: #fffacd;
       --soft-blue: #e6f7ff;
+      --light-h3: #f5f5f5;
+      --border: #e5e7eb;
     }
     * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-      margin: 24px;
-      color: var(--gray-900);
-      background: #fff;
-      line-height: 1.45;
-    }
-    h1 {
-      background-color: #808080;
-      color: white;
-      padding: 12px 16px;
-      text-align: center;
-      border-radius: 10px;
-      margin-top: 0;
-    }
-    label { font-weight: 600; }
-    input, button {
-      margin: 6px 0;
-      padding: 10px 12px;
-      font-size: 16px;
-    }
-    input[type="date"] {
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-    }
+    body { font-family: Arial, "Noto Sans KR", sans-serif; margin: 20px; color: #111; background: #ffffff; }
+    h1 { background:#808080; color:#fff; padding:12px 16px; text-align:center; border-radius:10px; margin:0 0 16px; }
+
+    /* 입력 영역 */
+    label { font-weight:700; width:180px; font-size:18px; }
+    input, button { padding:10px 12px; font-size:16px; }
+    input[type="date"], input[type="number"] { width:240px; border:1px solid #d1d5db; border-radius:8px; text-align:right; }
+    .field-group { display:flex; flex-direction:column; gap:8px; max-width:760px; }
+    .field-row { display:flex; align-items:center; gap:20px; }
     button {
-      border: 0;
-      border-radius: 8px;
-      background: var(--brand);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
+      border:0;
+      border-radius:8px;
+      font-weight:700;
+      cursor:pointer;
+      white-space:nowrap;
+      padding:10px 20px;
+      width:120px;
     }
-    button:disabled { opacity: .6; cursor: not-allowed; }
-
-    #result { margin-top: 20px; }
-
-    table {
-      width: 100%;
-      margin-top: 10px;
-      border-collapse: collapse;
-      table-layout: auto;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      overflow: hidden;
+    #calcBtn {
+      background:var(--brand);
+      color:#fff;
+      font-weight:900;
+      width:120px;
     }
-    table, th, td { border: 1px solid #e5e7eb; }
-    th, td {
+    .default-btn {
+      background-color:#87CEFA;
+      color:#fff;
+      font-weight:bold;
+      width:120px;
+      padding:10px 20px;
+    }
+
+    /* 결과 박스 */
+    #result { margin-top:20px; }
+    #result h2 {
+      background-color: #fffacd;
+      display: block;
       padding: 10px 12px;
-      text-align: center;
+      border-radius: 6px;
+      margin-bottom: 8px;
     }
-    th { background-color: #D3D3D3; }
+    .result-box { background:var(--accent); border:3px solid #f59e0b; border-radius:8px; padding:14px; font-size:18px; font-weight:700; margin-top:0; }
+    .fee-item { color:#1d4ed8; font-size:18px; font-weight:700; text-align:left; margin:10px 0; }
 
-    .fee-breakdown { margin-top: 30px; border-top: 2px solid #000; padding-top: 20px; }
-    .total-fee { font-weight: bold; background-color: var(--accent); }
-
-    .total-fee-box {
-      background-color: var(--accent);
-      padding: 12px;
-      font-size: 18px;
-      margin-top: 20px;
-      font-weight: bold;
-      border-radius: 8px;
-      border: 1px dashed #f59e0b;
-    }
-
-    /* 공통 스타일 */
-    .fee-item {
-      color: #1d4ed8;
-      font-size: 18px;
-      padding-left: 20px;
-      font-weight: bold;
-      text-align: left;
-    }
-    .next-payment-date {
-      background-color: #FFFFE0;
-      padding: 10px 12px;
-      font-size: 18px;
-      color: #1d4ed8;
-      font-weight: bold;
-      text-align: left;
-      border-radius: 8px;
-      border: 1px dashed #f59e0b;
-    }
-    .hint { color: var(--gray-700); font-size: 14px; margin-top: 4px; }
+    /* 표/세부내역 */
+    .fee-breakdown { margin-top:30px; border-top:2px solid #000; padding-top:20px; }
+    .fee-breakdown h3 { background:var(--light-h3); padding:10px 12px; border-radius:8px; margin:0 0 10px; }
+    table { width:100%; margin-top:10px; border-collapse:collapse; table-layout:auto; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    table, th, td { border:1px solid var(--border); }
+    th, td { padding:10px 12px; text-align:center; }
+    th { background:#D3D3D3; }
+    .total-fee { font-weight:700; background:var(--accent); }
+    .calc-info { margin-top:20px; font-size:16px; font-weight:600; color:#333; }
   </style>
 </head>
 <body>
   <h1>아이보람 일산/화정/파주센터 신규회원 회비 계산기</h1>
 
-  <label for="startDate">시작 날짜 (YYYY-MM-DD):</label>
-  <input type="date" id="startDate" />
-  <button id="calcBtn" onclick="calculateFee()">계산하기</button>
-  <div class="hint">첫 달은 해당 월의 남은 일수 기준으로 일할 계산하며, 둘째/셋째 달은 정액. 가입비 3만원 포함. 총액은 <b>십(10) 원 단위 절사</b>합니다.</div>
+  <div class="field-group">
+    <div class="field-row">
+      <label for="startDate">● 시작 날짜</label>
+      <input type="date" id="startDate" />
+      <button id="calcBtn" onclick="calculateFee()"><b>계산하기</b></button>
+    </div>
+
+    <div class="field-row">
+      <label for="directorMonthly">● 원장님 월회비</label>
+      <input type="number" id="directorMonthly" placeholder="예: 190000" step="10" />
+      <button class="default-btn" onclick="setDefault('directorMonthly',190000)">기본값</button>
+    </div>
+
+    <div class="field-row">
+      <label for="instructorMonthly">● 강사님 월회비</label>
+      <input type="number" id="instructorMonthly" placeholder="예: 160000" step="10" />
+      <button class="default-btn" onclick="setDefault('instructorMonthly',160000)">기본값</button>
+    </div>
+
+    <div class="field-row">
+      <label for="signupFee">● 가입비</label>
+      <input type="number" id="signupFee" placeholder="예: 30000" step="10" />
+      <button class="default-btn" onclick="setDefault('signupFee',30000)">기본값</button>
+    </div>
+  </div>
 
   <div id="result" aria-live="polite">
     <h2>결과</h2>
-
-    <div class="total-fee-box">
+    <div class="result-box">
       <p class="fee-item"> ● 원장님(영어 전공자) 총 회비 : <span id="directorFinalFeeResult"></span></p>
       <p class="fee-item"> ● 강사님(영어 비전공자) 총 회비 : <span id="instructorFinalFeeResult"></span></p>
+      <p class="fee-item"> ● 다음 회비 납부일 (회원에게 꼭 알려드릴 것!): <span id="nextPaymentDateResult"></span></p>
     </div>
-
-    <br />
-
-    <div class="next-payment-date">
-      <p> ● 다음 회비 납부일 (회원에게 꼭 알려드릴 것!): <span id="nextPaymentDateResult"></span></p>
-    </div>
+    <div class="calc-info">계산방법: 첫 달은 해당 월의 남은 일수 기준으로 일할 계산하며, 둘째/셋째 달은 정액. 가입비 3만원 포함. 총액은 십(10) 원 단위 절사합니다.</div>
 
     <div class="fee-breakdown">
       <h3>원장님(영어 전공자) 회비계산 세부내역</h3>
       <table id="directorFeeBreakdown">
         <thead>
-          <tr>
-            <th>항목</th>
-            <th>계산 내역</th>
-          </tr>
+          <tr><th>항목</th><th>계산 내역</th></tr>
         </thead>
         <tbody>
           <tr>
@@ -143,15 +123,15 @@
           </tr>
           <tr>
             <td>② 2개월차 회비</td>
-            <td>190,000 원</td>
+            <td id="directorSecondMonth"></td>
           </tr>
           <tr>
             <td>③ 3개월차 회비</td>
-            <td>190,000 원</td>
+            <td id="directorThirdMonth"></td>
           </tr>
           <tr>
             <td>④ 가입비</td>
-            <td>30,000 원</td>
+            <td id="directorSignupFee"></td>
           </tr>
           <tr class="total-fee">
             <td>총 회비 (①+②+③+④ 합산 후 <b>십 단위 절사</b>)</td>
@@ -165,10 +145,7 @@
       <h3>강사님(영어 비전공자) 회비계산 세부내역</h3>
       <table id="instructorFeeBreakdown">
         <thead>
-          <tr>
-            <th>항목</th>
-            <th>계산 내역</th>
-          </tr>
+          <tr><th>항목</th><th>계산 내역</th></tr>
         </thead>
         <tbody>
           <tr>
@@ -181,15 +158,15 @@
           </tr>
           <tr>
             <td>② 2개월차 회비</td>
-            <td>160,000 원</td>
+            <td id="instructorSecondMonth"></td>
           </tr>
           <tr>
             <td>③ 3개월차 회비</td>
-            <td>160,000 원</td>
+            <td id="instructorThirdMonth"></td>
           </tr>
           <tr>
             <td>④ 가입비</td>
-            <td>30,000 원</td>
+            <td id="instructorSignupFee"></td>
           </tr>
           <tr class="total-fee">
             <td>총 회비 (①+②+③+④ 합산 후 <b>십 단위 절사</b>)</td>
@@ -201,87 +178,63 @@
   </div>
 
   <script>
-    // YYYY-MM-DD 문자열 반환
-    function formatISODate(date) {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
-    }
+    function setDefault(id, value){ document.getElementById(id).value = value; }
+    function formatISODate(date){ const y=date.getFullYear(); const m=String(date.getMonth()+1).padStart(2,'0'); const d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
+    function daysInMonth(year, m0){ return new Date(year, m0+1, 0).getDate(); }
+    function valOrDefault(id, def){ const raw=(document.getElementById(id).value||'').trim(); if(raw==='') return def; const n=Number(raw.replace(/[^0-9.-]/g,'')); return Number.isFinite(n)?n:def; }
 
-    // 해당 월의 총 일수
-    function daysInMonth(year, monthIndex0) {
-      return new Date(year, monthIndex0 + 1, 0).getDate();
-    }
-
-    function calculateFee() {
-      const startDateStr = document.getElementById("startDate").value;
-      if (!startDateStr) {
-        alert("시작 날짜를 입력해주세요.");
-        return;
-      }
-
+    function calculateFee(){
+      const startDateStr = document.getElementById('startDate').value;
+      if(!startDateStr){ alert('시작 날짜를 입력해주세요.'); return; }
       const start = new Date(startDateStr);
-      if (isNaN(start.getTime())) {
-        alert("유효한 날짜를 입력해주세요.");
-        return;
-      }
+      if(isNaN(start.getTime())){ alert('유효한 날짜를 입력해주세요.'); return; }
+
+      const DIRECTOR_MONTHLY = valOrDefault('directorMonthly',190000);
+      const INSTRUCTOR_MONTHLY = valOrDefault('instructorMonthly',160000);
+      const SIGNUP_FEE = valOrDefault('signupFee',30000);
 
       const year = start.getFullYear();
-      const month0 = start.getMonth(); // 0 기반
+      const month0 = start.getMonth();
       const totalDays = daysInMonth(year, month0);
       const startDay = start.getDate();
+      const daysLeft = totalDays - startDay + 1; // 시작일 포함
 
-      // 시작일 포함, 해당 월 말일까지 남은 일수
-      const daysLeft = totalDays - startDay + 1;
-
-      // 요금 정의
-      const DIRECTOR_MONTHLY = 190000;
-      const INSTRUCTOR_MONTHLY = 160000;
-      const SIGNUP_FEE = 30000;
-
-      // 1개월차 일할 계산 (해당 월 일수 기준)
       const directorFirstMonthFee = Math.floor((DIRECTOR_MONTHLY / totalDays) * daysLeft);
       const instructorFirstMonthFee = Math.floor((INSTRUCTOR_MONTHLY / totalDays) * daysLeft);
 
-      // 2,3개월 정액
       const directorSecondThird = DIRECTOR_MONTHLY * 2;
       const instructorSecondThird = INSTRUCTOR_MONTHLY * 2;
 
-      // 총액 (가입비 포함)
-      const directorTotal = directorFirstMonthFee + directorSecondThird + SIGNUP_FEE;
-      const instructorTotal = instructorFirstMonthFee + instructorSecondThird + SIGNUP_FEE;
+      const cut10 = (n)=>Math.floor(n/10)*10;
+      const directorTotal = cut10(directorFirstMonthFee + directorSecondThird + SIGNUP_FEE);
+      const instructorTotal = cut10(instructorFirstMonthFee + instructorSecondThird + SIGNUP_FEE);
 
-      // 🔧 규칙: 십(10) 원 단위 절사 (예: 12,345 → 12,340)
-      const truncate10 = (n) => Math.floor(n / 10) * 10;
+      document.getElementById('directorFinalFeeResult').innerText = `${directorTotal.toLocaleString('ko-KR')} 원`;
+      document.getElementById('instructorFinalFeeResult').innerText = `${instructorTotal.toLocaleString('ko-KR')} 원`;
+      const nextPaymentDate = new Date(start.getFullYear(), start.getMonth()+3, 1);
+      document.getElementById('nextPaymentDateResult').innerText = formatISODate(nextPaymentDate);
 
-      const directorFinal = truncate10(directorTotal);
-      const instructorFinal = truncate10(instructorTotal);
+      document.getElementById('directorDays').innerText = `${daysLeft}일`;
+      document.getElementById('directorFirstMonthFee').innerText = `${directorFirstMonthFee.toLocaleString('ko-KR')} 원`;
+      document.getElementById('directorSecondMonth').innerText = `${DIRECTOR_MONTHLY.toLocaleString('ko-KR')} 원`;
+      document.getElementById('directorThirdMonth').innerText = `${DIRECTOR_MONTHLY.toLocaleString('ko-KR')} 원`;
+      document.getElementById('directorSignupFee').innerText = `${SIGNUP_FEE.toLocaleString('ko-KR')} 원`;
+      document.getElementById('directorFinalFee').innerText = `${directorTotal.toLocaleString('ko-KR')} 원`;
 
-      // 출력
-      document.getElementById("directorDays").innerText = `${daysLeft}일`;
-      document.getElementById("directorFirstMonthFee").innerText = `${directorFirstMonthFee.toLocaleString("ko-KR")} 원`;
-      document.getElementById("directorFinalFee").innerText = `${directorFinal.toLocaleString("ko-KR")} 원`;
-
-      document.getElementById("instructorDays").innerText = `${daysLeft}일`;
-      document.getElementById("instructorFirstMonthFee").innerText = `${instructorFirstMonthFee.toLocaleString("ko-KR")} 원`;
-      document.getElementById("instructorFinalFee").innerText = `${instructorFinal.toLocaleString("ko-KR")} 원`;
-
-      document.getElementById("directorFinalFeeResult").innerText = `${directorFinal.toLocaleString("ko-KR")} 원`;
-      document.getElementById("instructorFinalFeeResult").innerText = `${instructorFinal.toLocaleString("ko-KR")} 원`;
-
-      // 다음 회비 납부일: 시작일 기준 3개월 후의 해당 월 1일
-      const nextPaymentDate = new Date(start);
-      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 3);
-      nextPaymentDate.setDate(1);
-      document.getElementById("nextPaymentDateResult").innerText = formatISODate(nextPaymentDate);
+      document.getElementById('instructorDays').innerText = `${daysLeft}일`;
+      document.getElementById('instructorFirstMonthFee').innerText = `${instructorFirstMonthFee.toLocaleString('ko-KR')} 원`;
+      document.getElementById('instructorSecondMonth').innerText = `${INSTRUCTOR_MONTHLY.toLocaleString('ko-KR')} 원`;
+      document.getElementById('instructorThirdMonth').innerText = `${INSTRUCTOR_MONTHLY.toLocaleString('ko-KR')} 원`;
+      document.getElementById('instructorSignupFee').innerText = `${SIGNUP_FEE.toLocaleString('ko-KR')} 원`;
+      document.getElementById('instructorFinalFee').innerText = `${instructorTotal.toLocaleString('ko-KR')} 원`;
     }
 
-    // UX: 기본값을 오늘 날짜로 설정
-    (function setTodayDefault() {
+    (function initDefaults(){
       const today = new Date();
-      const el = document.getElementById("startDate");
-      el.value = formatISODate(today);
+      document.getElementById('startDate').value = formatISODate(today);
+      setDefault('directorMonthly',190000);
+      setDefault('instructorMonthly',160000);
+      setDefault('signupFee',30000);
     })();
   </script>
 </body>
